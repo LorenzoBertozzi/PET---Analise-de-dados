@@ -2,38 +2,29 @@
 import numpy as np
 import pandas as pd 
 import matplotlib.pyplot as plt
-import seaborn  as sns
 
 #%%
 import os
 print(os.listdir('CSV'))
-diretorio = 'CSV'
-arquivos_combinados = pd.DataFrame()
 
-for arquivo in  os.listdir(diretorio + "/"):
-    #print(arquivo)
-    dados = pd.read_csv("CSV/" + arquivo)
-    arquivos_combinados = pd.concat([arquivos_combinados,dados], ignore_index=True)
+df1 = pd.read_csv('CSV\Avaliação Pré Minicurso Introdução ao LaTeX (respostas) - Respostas ao formulário 1.csv')
+df2 = pd.read_csv('CSV\Avaliação Pós Minicurso Introdução ao LaTeX (respostas) - Respostas ao formulário 1.csv')
 
-arquivos_combinados.to_csv('CSV/arquivos_combinados.csv', index=False)
+df_merged = pd.merge(df1, df2, on=['Endereço de e-mail','Nome Completo:','Qual seu curso? '], how='inner')
+df_merged = df_merged.drop('Carimbo de data/hora_y', axis=1)
 
-dados_combinados = pd.read_csv('CSV/arquivos_combinados.csv')
-dados_combinados = dados_combinados.apply(lambda x: x.astype(str).str.lower())
-dados_combinados.head()
+df_merged.head()
+
 #%%
-
-dados_tecnico = dados_combinados.loc[dados_combinados['Qual seu curso? '].str.contains('técnico')]
-dados_engenharia = dados_combinados.loc[dados_combinados['Qual seu curso? '].str.contains('engenharia')]
+dados_tecnico = df_merged.loc[df_merged['Qual seu curso? '].str.contains('técnico')]
+dados_engenharia = df_merged.loc[df_merged['Qual seu curso? '].str.contains('Engenharia')]
 
 #%%
 dados_engenharia.head()
 
-# %%
-#efetividade do minicuruso
-tabela_efetividade = pd.DataFrame()
-tabela_efetividade = pd.merge(dados_engenharia['4 -  Quanto você avalia suas expectativas em relação ao curso.'],dados_engenharia['7- O quanto suas expectativas foram atendidas nesse minicurso?'],on=dados_engenharia, how='outer',indicator=True)
+#%%COMPARAÇÂO DE NIVEL
+print(df_merged['1 - Como você julga seu nível de conhecimento atual sobre o tema do minicurso que você esta fazendo?'].mean())
+print(df_merged['4- Como você julga seu nível de conhecimento na acerca do tema após o minicurso:'].mean())
 
-tabela_efetividade.head()
-
-#nesse caso todos os campos da coluna 7 estao vazios!!
-
+#%% MEDIA DE MOTIVAÇÂO 
+print(df_merged['2 - O quanto motivado você esta para realizar esse minicurso?'].mean())
